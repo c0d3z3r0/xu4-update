@@ -24,7 +24,6 @@ SKIP_BACKUP=${SKIP_BACKUP:-0}
 SKIP_DOWNLOAD=${SKIP_DOWNLOAD:-0}
 SKIP_WARNING=${SKIP_WARNING:-0}
 WANT_SYMVERS=${WANT_SYMVERS:-0}
-RPI_UPDATE_UNSUPPORTED=${RPI_UPDATE_UNSUPPORTED:-0}
 JUST_CHECK=${JUST_CHECK:-0}
 FW_REPO="${REPO_URI}.git"
 FW_REPOLOCAL=${FW_REPOLOCAL:-"${WORK_PATH}/.rpi-firmware"}
@@ -32,7 +31,6 @@ FW_PATH="${BOOT_PATH}"
 FW_MODPATH="${ROOT_PATH}/lib/modules"
 FW_REV=${1:-""}
 FW_REVFILE="${FW_PATH}/.firmware_revision"
-[ "${RPI_UPDATE_UNSUPPORTED}" -ne 0 ] && echo -e "You appear to be trying to update firmware on an incompatible distribution. To force update, run the following:\nsudo -E RPI_UPDATE_UNSUPPORTED=0 rpi-update" && exit 1
 
 function update_self() {
 	echo " *** Performing self-update"
