@@ -95,11 +95,6 @@ function show_notice {
 
 function update_firmware {
 	echo " *** Updating firmware"
-	rm -rf "${FW_PATH}/"*.elf
-	rm -rf "${FW_PATH}/"bootcode.bin
-	cp "${FW_REPOLOCAL}/"*.elf "${FW_PATH}/"
-	cp "${FW_REPOLOCAL}/"*.bin "${FW_PATH}/"
-	cp "${FW_REPOLOCAL}/"*.dat "${FW_PATH}/"
 	cp "${FW_REPOLOCAL}/"*.img "${FW_PATH}/"
 	if [[ -n $(shopt -s nullglob; echo "${FW_REPOLOCAL}/"*.dtb) ]]; then
 		cp "${FW_REPOLOCAL}/"*.dtb "${FW_PATH}/"
@@ -122,10 +117,6 @@ function update_firmware {
 }
 
 function finalise {
-	if [[ -f "${FW_PATH}/arm192_start.elf" ]]; then
-		echo " *** Setting 192M ARM split"
-		cp "${FW_PATH}/arm192_start.elf" "${FW_PATH}/start.elf"
-	fi
 	if [[ -e ${ROOT_PATH}/etc ]]; then
 		echo " *** Running ldconfig"
 		ldconfig -r "${ROOT_PATH}"
