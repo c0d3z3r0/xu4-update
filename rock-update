@@ -24,7 +24,6 @@ BRANCH=${BRANCH:-"master"}
 ROOT_PATH=${ROOT_PATH:-"/"}
 BOOT_PATH=${BOOT_PATH:-"/boot"}
 WORK_PATH=${WORK_PATH:-"${ROOT_PATH}/root"}
-SKIP_KERNEL=${SKIP_KERNEL:-0}
 SKIP_SDK=${SKIP_SDK:-0}
 SKIP_REPODELETE=${SKIP_REPODELETE:-0}
 SKIP_BACKUP=${SKIP_BACKUP:-0}
@@ -71,21 +70,17 @@ EOF
 }
 
 function update_modules {
-	if [[ ${SKIP_KERNEL} -eq 0 ]]; then
-		echo " *** Updating kernel modules"
-		find "${FW_REPOLOCAL}/modules" -mindepth 1 -maxdepth 1 -type d | while read DIR; do
-			BASEDIR=$(basename "${DIR}")
-			rm -rf "${FW_MODPATH}/${BASEDIR}/kernel"
-		done
-		cp -R "${FW_REPOLOCAL}/modules/"* "${FW_MODPATH}/"
-		find "${FW_REPOLOCAL}/modules" -mindepth 1 -maxdepth 1 -type d | while read DIR; do
-			BASEDIR=$(basename "${DIR}")
-			echo " *** depmod ${BASEDIR}"
-			depmod -b "${ROOT_PATH}" -a "${BASEDIR}"
-		done
-	else
-		echo " *** As requested, not updating kernel modules"
-	fi
+	echo " *** Updating kernel modules"
+	find "${FW_REPOLOCAL}/modules" -mindepth 1 -maxdepth 1 -type d | while read DIR; do
+		BASEDIR=$(basename "${DIR}")
+		rm -rf "${FW_MODPATH}/${BASEDIR}/kernel"
+	done
+	cp -R "${FW_REPOLOCAL}/modules/"* "${FW_MODPATH}/"
+	find "${FW_REPOLOCAL}/modules" -mindepth 1 -maxdepth 1 -type d | while read DIR; do
+		BASEDIR=$(basename "${DIR}")
+		echo " *** depmod ${BASEDIR}"
+		depmod -b "${ROOT_PATH}" -a "${BASEDIR}"
+	done
 }
 
 function update_vc_libs {
@@ -140,20 +135,16 @@ function update_firmware {
 	cp "${FW_REPOLOCAL}/"*.elf "${FW_PATH}/"
 	cp "${FW_REPOLOCAL}/"*.bin "${FW_PATH}/"
 	cp "${FW_REPOLOCAL}/"*.dat "${FW_PATH}/"
-	if [[ ${SKIP_KERNEL} -eq 0 ]]; then
-		cp "${FW_REPOLOCAL}/"*.img "${FW_PATH}/"
-		if [[ -n $(shopt -s nullglob; echo "${FW_REPOLOCAL}/"*.dtb) ]]; then
-			cp "${FW_REPOLOCAL}/"*.dtb "${FW_PATH}/"
+	cp "${FW_REPOLOCAL}/"*.img "${FW_PATH}/"
+	if [[ -n $(shopt -s nullglob; echo "${FW_REPOLOCAL}/"*.dtb) ]]; then
+		cp "${FW_REPOLOCAL}/"*.dtb "${FW_PATH}/"
+	fi
+	if [[ -n $(shopt -s nullglob; echo "${FW_REPOLOCAL}/overlays/"*.dtb) ]]; then
+		mkdir -p "${FW_PATH}/overlays"
+		cp "${FW_REPOLOCAL}/overlays/"*.dtb "${FW_PATH}/overlays/"
+		if [[ -f "${FW_REPOLOCAL}/overlays/README" ]]; then
+			cp "${FW_REPOLOCAL}/overlays/README" "${FW_PATH}/overlays/"
 		fi
-		if [[ -n $(shopt -s nullglob; echo "${FW_REPOLOCAL}/overlays/"*.dtb) ]]; then
-			mkdir -p "${FW_PATH}/overlays"
-			cp "${FW_REPOLOCAL}/overlays/"*.dtb "${FW_PATH}/overlays/"
-			if [[ -f "${FW_REPOLOCAL}/overlays/README" ]]; then
-				cp "${FW_REPOLOCAL}/overlays/README" "${FW_PATH}/overlays/"
-			fi
-		fi
-	else
-		echo " *** As requested, not updating kernel"
 	fi
 	if [[ ${WANT_SYMVERS} -ne 0 ]]; then
 		if [[ -f "${FW_REPOLOCAL}/Module.symvers" ]]; then
@@ -187,15 +178,13 @@ function do_backup {
 		fi
 		echo " *** Backing up firmware"
 		cp -a "${FW_PATH}" "${FW_PATH}.bak"
-		if [[ ${SKIP_KERNEL} -eq 0 ]]; then
-			if [[ -d "${FW_MODPATH}.bak" ]]; then
-				echo " *** Remove old modules backup"
-				rm -rf "${FW_MODPATH}.bak"
-			fi
-			echo " *** Backing up modules $(uname -r)"
-			if [[ -d "${FW_MODPATH}/$(uname -r)" ]]; then
-				mkdir -p "${FW_MODPATH}.bak" && cp -a "${FW_MODPATH}/$(uname -r)" "${FW_MODPATH}.bak"
-			fi
+		if [[ -d "${FW_MODPATH}.bak" ]]; then
+			echo " *** Remove old modules backup"
+			rm -rf "${FW_MODPATH}.bak"
+		fi
+		echo " *** Backing up modules $(uname -r)"
+		if [[ -d "${FW_MODPATH}/$(uname -r)" ]]; then
+			mkdir -p "${FW_MODPATH}.bak" && cp -a "${FW_MODPATH}/$(uname -r)" "${FW_MODPATH}.bak"
 		fi
 	fi
 }
@@ -302,7 +291,7 @@ if [[ ! -d "${FW_PATH}" ]]; then
 	mkdir -p ${FW_PATH}
 fi
 
-if [[ ${SKIP_KERNEL} -eq 0 ]] && [[ ! -d "${FW_MODPATH}" ]]; then
+if [[ ! -d "${FW_MODPATH}" ]]; then
 	echo " !!! ${FW_MODPATH} doesn't exist - creating"
 	mkdir -p ${FW_MODPATH}
 fi
