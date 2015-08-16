@@ -26,7 +26,7 @@ SKIP_WARNING=${SKIP_WARNING:-0}
 WANT_SYMVERS=${WANT_SYMVERS:-0}
 JUST_CHECK=${JUST_CHECK:-0}
 FW_REPO="${REPO_URI}.git"
-FW_REPOLOCAL=${FW_REPOLOCAL:-"${WORK_PATH}/.rpi-firmware"}
+FW_REPOLOCAL=${FW_REPOLOCAL:-"${WORK_PATH}/.rock-firmware"}
 FW_PATH="${BOOT_PATH}"
 FW_MODPATH="${ROOT_PATH}/lib/modules"
 FW_REV=${1:-""}
@@ -37,7 +37,7 @@ function update_self() {
 	_tempFileName="$0.tmp"
 
 	if ! curl -Ls --output "${_tempFileName}" "${UPDATE_URI}"; then
-		echo " !!! Failed to download update for rpi-update!"
+		echo " !!! Failed to download update for rock-update!"
 		echo " !!! Make sure you have ca-certificates installed and that the time is set correctly"
 		exit 1
 	fi
@@ -227,7 +227,8 @@ if [[ ${EUID} -ne 0 ]]; then
 	exit 1
 fi
 
-echo " *** Raspberry Pi firmware updater by Hexxeh, enhanced by AndrewS and Dom"
+echo " *** Radxa Rock firmware updater by c0d3z3r0"
+echo " *** based on rpi-update by Hexxeh, enhanced by AndrewS and Dom"
 
 if [[ ! -d ${WORK_PATH} ]]; then
 	echo " !!! ${WORK_PATH} doesn't exist - creating"
