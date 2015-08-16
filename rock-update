@@ -18,7 +18,6 @@ BRANCH=${BRANCH:-"master"}
 ROOT_PATH=${ROOT_PATH:-"/"}
 BOOT_PATH=${BOOT_PATH:-"/boot"}
 WORK_PATH=${WORK_PATH:-"${ROOT_PATH}/root"}
-SKIP_SDK=${SKIP_SDK:-0}
 SKIP_REPODELETE=${SKIP_REPODELETE:-0}
 SKIP_BACKUP=${SKIP_BACKUP:-0}
 SKIP_DOWNLOAD=${SKIP_DOWNLOAD:-0}
@@ -73,32 +72,6 @@ function update_modules {
 		echo " *** depmod ${BASEDIR}"
 		depmod -b "${ROOT_PATH}" -a "${BASEDIR}"
 	done
-}
-
-function update_vc_libs {
-	echo " *** Updating VideoCore libraries"
-
-	if [[ -e ${ROOT_PATH}/bin/sh ]]; then
-		ELFOUTPUT=$(readelf -a "${ROOT_PATH}/bin/sh")
-	else
-		ELFOUTPUT="VFP_args"
-	fi
-	if [[ "${ELFOUTPUT}" != "${ELFOUTPUT/VFP_args/}" ]]; then
-		echo " *** Using HardFP libraries"
-		cp -R "${FW_REPOLOCAL}/vc/hardfp/"* "${ROOT_PATH}/"
-	else
-		echo " *** Using SoftFP libraries"
-		cp -R "${FW_REPOLOCAL}/vc/softfp/"* "${ROOT_PATH}/"
-	fi
-}
-
-function update_sdk {
-	if [[ ${SKIP_SDK} -eq 0 ]]; then
-		echo " *** Updating SDK"
-		cp -R "${FW_REPOLOCAL}/vc/sdk/"* "${ROOT_PATH}/"
-	else
-		echo " *** As requested, not updating SDK"
-	fi
 }
 
 function show_notice {
@@ -190,8 +163,6 @@ function do_update {
 	fi
 	update_firmware
 	update_modules
-	update_vc_libs
-	update_sdk
 	finalise
 	if [[ -f "${FW_REPOLOCAL}/post-install" ]]; then
 		echo " *** Running post-install script"
