@@ -3,10 +3,10 @@
 set -o nounset
 set -o errexit
 
-REPO_URI=${REPO_URI:-"https://github.com/Hexxeh/rpi-firmware"}
+REPO_URI=${REPO_URI:-"https://github.com/c0d3z3r0/rock-firmware"}
 
 UPDATE_SELF=${UPDATE_SELF:-1}
-UPDATE_URI="https://raw.githubusercontent.com/Hexxeh/rpi-update/master/rpi-update"
+UPDATE_URI="https://raw.githubusercontent.com/c0d3z3r0/rock-update/master/rock-update"
 
 if [[ ${BOOT_PATH:-"unset"} == "unset" && ${ROOT_PATH:-"unset"} != "unset" ]] ||
 [[ ${BOOT_PATH:-"unset"} != "unset" && ${ROOT_PATH:-"unset"} == "unset" ]]; then
@@ -104,7 +104,7 @@ function update_sdk {
 }
 
 function show_notice {
-	local NOTICE=`curl -Lfs https://raw.githubusercontent.com/hexxeh/rpi-firmware/${FW_REV}/NOTICE.md`
+	local NOTICE=`curl -Lfs https://raw.githubusercontent.com/c0d3z3r0/rock-firmware/${FW_REV}/NOTICE.md`
 	if [ -z "$NOTICE" ]; then
 		return
 	fi
