@@ -3,7 +3,7 @@
 set -o nounset
 set -o errexit
 
-REPO_URI=${REPO_URI:-"https://github.com/c0d3z3r0/rock-firmware"}
+REPO_URI=${REPO_URI:-"https://github.com/c0d3z3r0/radxarock-firmware"}
 
 UPDATE_SELF=${UPDATE_SELF:-1}
 UPDATE_URI="https://raw.githubusercontent.com/c0d3z3r0/rock-update/master/rock-update"
@@ -25,7 +25,7 @@ SKIP_WARNING=${SKIP_WARNING:-0}
 WANT_SYMVERS=${WANT_SYMVERS:-0}
 JUST_CHECK=${JUST_CHECK:-0}
 FW_REPO="${REPO_URI}.git"
-FW_REPOLOCAL=${FW_REPOLOCAL:-"${WORK_PATH}/.rock-firmware"}
+FW_REPOLOCAL=${FW_REPOLOCAL:-"${WORK_PATH}/.radxarock-firmware"}
 FW_PATH="${BOOT_PATH}"
 FW_MODPATH="${ROOT_PATH}/lib/modules"
 FW_REV=${1:-""}
@@ -75,7 +75,7 @@ function update_modules {
 }
 
 function show_notice {
-	local NOTICE=`curl -Lfs https://raw.githubusercontent.com/c0d3z3r0/rock-firmware/${FW_REV}/NOTICE.md`
+	local NOTICE=`curl -Lfs https://raw.githubusercontent.com/c0d3z3r0/radxarock-firmware/${FW_REV}/NOTICE.md`
 	if [ -z "$NOTICE" ]; then
 		return
 	fi

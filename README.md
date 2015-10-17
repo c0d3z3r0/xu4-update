@@ -24,7 +24,7 @@ the new firmware.
 ## Options
 
 To upgrade/downgrade to a specific firmware revision, specify its Git hash
-(from the https://github.com/c0d3z3r0/rock-firmware repository) as follows:
+(from the https://github.com/c0d3z3r0/radxarock-firmware repository) as follows:
 
     sudo rock-update fab7796df0cf29f9563b507a59ce5b17d93e0390
 
@@ -50,7 +50,7 @@ Avoids making backup of /boot and /lib/modules on first run.
 
     sudo SKIP_REPODELETE=1 rock-update
 
-By default the downloaded files (/root/.rock-firmware) are deleted at end of update.
+By default the downloaded files (/root/.radxarock-firmware) are deleted at end of update.
 Use this option to keep the files.
 
 #### `ROOT_PATH` and `BOOT_PATH`
