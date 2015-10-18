@@ -128,12 +128,12 @@ function update_bootloader {
 	if ! [[ -f "${BOOT_PATH}"/boot.conf ]]; then
 		mkdir -p "${BOOT_PATH}"/loader/entries
 		touch "${BOOT_PATH}"/loader/entries/boot.conf
-		ln -s "${BOOT_PATH}"/loader/entries/boot.conf "${BOOT_PATH}"/boot.conf
 	fi
 	# Preserve cmdline
-	CMDLINE=$(grep '^options.*$' "${BOOT_PATH}"/boot.conf)
-	cat "${FW_REPOLOCAL}"/boot.conf >"${BOOT_PATH}"/boot.conf
-	IFS='%' sed -i'.orig' "s/^options.*$/${CMDLINE}/" "${BOOT_PATH}"/boot.conf
+	BOOT_CONF="${BOOT_PATH}"/loader/entries/boot.conf
+	CMDLINE=$(grep '^options.*$' "${BOOT_CONF}")
+	cat "${FW_REPOLOCAL}"/boot.conf >"${BOOT_CONF}"
+	IFS='%' sed -i'.orig' "s/^options.*$/${CMDLINE}/" "${BOOT_CONF}"
 	# Write bootloader to sd card
 	echo " *** Writing new bootloader to sd card"
 	cp "${FW_REPOLOCAL}"/boot.bin "${BOOT_PATH}"/
