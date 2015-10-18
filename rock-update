@@ -131,9 +131,11 @@ function update_bootloader {
 	fi
 	# Preserve cmdline
 	BOOT_CONF="${BOOT_PATH}"/loader/entries/boot.conf
-	CMDLINE=$(grep '^options.*$' "${BOOT_CONF}")
+	CMDLINE=$(grep '^options.*$' "${BOOT_CONF}" || true)
 	cat "${FW_REPOLOCAL}"/boot.conf >"${BOOT_CONF}"
-	IFS='%' sed -i'.orig' "s/^options.*$/${CMDLINE}/" "${BOOT_CONF}"
+	if [[ "${CMDLINE}" ]]; then
+		IFS='%' sed -i'.orig' "s/^options.*$/${CMDLINE}/" "${BOOT_CONF}"
+	fi
 	# Write bootloader to sd card
 	echo " *** Writing new bootloader to sd card"
 	cp "${FW_REPOLOCAL}"/boot.bin "${BOOT_PATH}"/
