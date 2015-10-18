@@ -14,7 +14,7 @@ if [[ ${BOOT_PATH:-"unset"} == "unset" && ${ROOT_PATH:-"unset"} != "unset" ]] ||
 	exit 1
 fi
 
-if [[ ! -f /dev/mmcblk0 && ${SD_DEV:-"unset"} == "unset" ]]; then
+if [[ ! -e /dev/mmcblk0 && ${SD_DEV:-"unset"} == "unset" ]]; then
 	echo " *** Root device not found. You need to specify the sdcard with SD_DEV"
 	exit 1
 fi
