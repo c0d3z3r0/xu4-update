@@ -14,10 +14,16 @@ if [[ ${BOOT_PATH:-"unset"} == "unset" && ${ROOT_PATH:-"unset"} != "unset" ]] ||
 	exit 1
 fi
 
+if [[ ! -f /dev/mmcblk0 && ${SD_DEV:-"unset"} == "unset" ]]; then
+	echo " *** Root device not found. You need to specify the sdcard with SD_DEV"
+	exit 1
+fi
+
 BRANCH=${BRANCH:-"master"}
 ROOT_PATH=${ROOT_PATH:-"/"}
 BOOT_PATH=${BOOT_PATH:-"/boot"}
 WORK_PATH=${WORK_PATH:-"${ROOT_PATH}/root"}
+SD_DEV=${SD_DEV:-"/dev/mmcblk0"}
 SKIP_REPODELETE=${SKIP_REPODELETE:-0}
 SKIP_BACKUP=${SKIP_BACKUP:-0}
 SKIP_DOWNLOAD=${SKIP_DOWNLOAD:-0}
@@ -116,6 +122,24 @@ function update_firmware {
 	fi
 }
 
+function update_bootloader {
+	echo " *** Updating bootloader config"
+	# First installation?
+	if ! [[ -f "${BOOT_PATH}"/boot.conf ]]; then
+		mkdir -p "${BOOT_PATH}"/loader/entries
+		touch "${BOOT_PATH}"/loader/entries/boot.conf
+		ln -s "${BOOT_PATH}"/loader/entries/boot.conf "${BOOT_PATH}"/boot.conf
+	fi
+	# Preserve cmdline
+	CMDLINE=$(grep '^options.*$' "${BOOT_PATH}"/boot.conf)
+	cat "${FW_REPOLOCAL}"/boot.conf >"${BOOT_PATH}"/boot.conf
+	IFS='%' sed -i'.orig' "s/^options.*$/${CMDLINE}/" "${BOOT_PATH}"/boot.conf
+	# Write bootloader to sd card
+	echo " *** Writing new bootloader to sd card"
+	cp "${FW_REPOLOCAL}"/boot.bin "${BOOT_PATH}"/
+	dd if="${BOOT_PATH}"/boot.bin of=${SD_DEV} bs=$((0x200)) seek=$((0x40))
+}
+
 function finalise {
 	if [[ -e ${ROOT_PATH}/etc ]]; then
 		echo " *** Running ldconfig"
@@ -154,6 +178,7 @@ function do_update {
 	fi
 	update_firmware
 	update_modules
+	update_bootloader
 	finalise
 	if [[ -f "${FW_REPOLOCAL}/post-install" ]]; then
 		echo " *** Running post-install script"
