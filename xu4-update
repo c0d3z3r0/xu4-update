@@ -3,10 +3,10 @@
 set -o nounset
 set -o errexit
 
-REPO_URI=${REPO_URI:-"https://github.com/c0d3z3r0/radxarock-firmware"}
+REPO_URI=${REPO_URI:-"https://github.com/c0d3z3r0/odroid-xu4"}
 
 UPDATE_SELF=${UPDATE_SELF:-1}
-UPDATE_URI="https://raw.githubusercontent.com/c0d3z3r0/rock-update/master/rock-update"
+UPDATE_URI="https://raw.githubusercontent.com/c0d3z3r0/xu4-update/master/xu4-update"
 
 if [[ ${BOOT_PATH:-"unset"} == "unset" && ${ROOT_PATH:-"unset"} != "unset" ]] ||
 [[ ${BOOT_PATH:-"unset"} != "unset" && ${ROOT_PATH:-"unset"} == "unset" ]]; then
@@ -14,7 +14,7 @@ if [[ ${BOOT_PATH:-"unset"} == "unset" && ${ROOT_PATH:-"unset"} != "unset" ]] ||
 	exit 1
 fi
 
-if [[ ! -e /dev/mmcblk0 && ${SD_DEV:-"unset"} == "unset" ]]; then
+if [[ ! -e /dev/mmcblk1 && ${SD_DEV:-"unset"} == "unset" ]]; then
 	echo " *** Root device not found. You need to specify the sdcard with SD_DEV"
 	exit 1
 fi
@@ -23,7 +23,7 @@ BRANCH=${BRANCH:-"master"}
 ROOT_PATH=${ROOT_PATH:-"/"}
 BOOT_PATH=${BOOT_PATH:-"/boot"}
 WORK_PATH=${WORK_PATH:-"${ROOT_PATH}/root"}
-SD_DEV=${SD_DEV:-"/dev/mmcblk0"}
+SD_DEV=${SD_DEV:-"/dev/mmcblk1"}
 SKIP_REPODELETE=${SKIP_REPODELETE:-0}
 SKIP_BACKUP=${SKIP_BACKUP:-0}
 SKIP_DOWNLOAD=${SKIP_DOWNLOAD:-0}
@@ -31,7 +31,7 @@ SKIP_WARNING=${SKIP_WARNING:-0}
 WANT_SYMVERS=${WANT_SYMVERS:-0}
 JUST_CHECK=${JUST_CHECK:-0}
 FW_REPO="${REPO_URI}.git"
-FW_REPOLOCAL=${FW_REPOLOCAL:-"${WORK_PATH}/.radxarock-firmware"}
+FW_REPOLOCAL=${FW_REPOLOCAL:-"${WORK_PATH}/.xu4-firmware"}
 FW_PATH="${BOOT_PATH}"
 FW_MODPATH="${ROOT_PATH}/lib/modules"
 FW_REV=${1:-""}
@@ -42,7 +42,7 @@ function update_self() {
 	_tempFileName="$0.tmp"
 
 	if ! curl -Ls --output "${_tempFileName}" "${UPDATE_URI}"; then
-		echo " !!! Failed to download update for rock-update!"
+		echo " !!! Failed to download update for xu4-update!"
 		echo " !!! Make sure you have ca-certificates installed and that the time is set correctly"
 		exit 1
 	fi
@@ -81,7 +81,7 @@ function update_modules {
 }
 
 function show_notice {
-	local NOTICE=`curl -Lfs https://raw.githubusercontent.com/c0d3z3r0/radxarock-firmware/${FW_REV}/NOTICE.md`
+	local NOTICE=`curl -Lfs https://raw.githubusercontent.com/c0d3z3r0/odroid-xu4/${FW_REV}/NOTICE.md`
 	if [ -z "$NOTICE" ]; then
 		return
 	fi
@@ -123,28 +123,12 @@ function update_firmware {
 }
 
 function update_bootloader {
-	echo " *** Updating bootloader config"
-	# First installation?
-	if ! [[ -f "${BOOT_PATH}"/boot.conf ]]; then
-		mkdir -p "${BOOT_PATH}"/loader/entries
-		touch "${BOOT_PATH}"/loader/entries/boot.conf
-	fi
-	# Preserve cmdline
-	BOOT_CONF="${BOOT_PATH}"/loader/entries/boot.conf
-	CMDLINE=$(grep '^options.*$' "${BOOT_CONF}" || true)
-	DEVTREE=$(grep '^devicetree.*$' "${BOOT_CONF}" || true)
-	cat "${FW_REPOLOCAL}"/boot.conf >"${BOOT_CONF}"
-	cp "${BOOT_CONF}" "${BOOT_CONF}.orig"
-	if [[ "${CMDLINE}" ]]; then
-		IFS='%' sed -i'' "s|^options.*$|${CMDLINE}|" "${BOOT_CONF}"
-	fi
-	if [[ "${DEVTREE}" ]]; then
-		IFS='%' sed -i'' "s|^devicetree.*$|${DEVTREE}|" "${BOOT_CONF}"
-	fi
-	# Write bootloader to sd card
 	echo " *** Writing new bootloader to sd card"
-	cp "${FW_REPOLOCAL}"/boot.bin "${BOOT_PATH}"/
-	dd if="${BOOT_PATH}"/boot.bin of=${SD_DEV} bs=$((0x200)) seek=$((0x40))
+	cp -r "${FW_REPOLOCAL}"/{blobs,boot.scr,u-boot-dtb.bin} "${BOOT_PATH}"/
+	dd if="${BOOT_PATH}"/blobs/bl1.bin.hardkernel  of=${SD_DEV} seek=1   bs=$((0x200))
+	dd if="${BOOT_PATH}"/blobs/bl2.bin.hardkernel  of=${SD_DEV} seek=31  bs=$((0x200))
+	dd if="${BOOT_PATH}"/u-boot-dtb.bin            of=${SD_DEV} seek=63  bs=$((0x200))
+	dd if="${BOOT_PATH}"/blobs/tzsw.bin.hardkernel of=${SD_DEV} seek=719 bs=$((0x200))
 }
 
 function finalise {
@@ -221,7 +205,7 @@ if [[ ${EUID} -ne 0 ]]; then
 	exit 1
 fi
 
-echo " *** Radxa Rock firmware updater by c0d3z3r0"
+echo " *** Odroid-XU4 firmware updater by c0d3z3r0"
 echo " *** based on rpi-update by Hexxeh, enhanced by AndrewS and Dom"
 
 if [[ ! -d ${WORK_PATH} ]]; then
