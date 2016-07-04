@@ -6,7 +6,7 @@ An easier way to update the firmware of your Radxa Rock (Pro).
 
 To install the tool, run the following command:
 
-    sudo curl -L --output /usr/bin/rock-update https://raw.githubusercontent.com/c0d3z3r0/rock-update/workbench/rock-update && sudo chmod +x /usr/bin/rock-update
+    sudo curl -L --output /usr/bin/rock-update https://raw.githubusercontent.com/c0d3z3r0/rock-update/master/rock-update && sudo chmod +x /usr/bin/rock-update
 
 ## Updating
 
