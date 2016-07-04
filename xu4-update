@@ -227,13 +227,6 @@ if [[ ! -d "${FW_MODPATH}" ]]; then
 	mkdir -p ${FW_MODPATH}
 fi
 
-command -v readelf >/dev/null 2>&1 || {
-	echo " !!! This tool requires you have readelf installed, please install it first"
-	echo "     In Debian, try: sudo apt-get install binutils"
-	echo "     In Arch, try: pacman -S binutils"
-	exit 1
-}
-
 # ask github for latest version hash
 REPO_API=${REPO_URI/github.com/api.github.com\/repos}/git/refs/heads/${BRANCH}
 GITREV=$(curl -s ${REPO_API} | awk '{ if ($1 == "\"sha\":") { print substr($2, 2, 40) } }')
