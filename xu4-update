@@ -128,7 +128,7 @@ function update_bootloader {
 	dd if="${BOOT_PATH}"/blobs/bl1.bin.hardkernel           of=${SD_DEV} seek=1   bs=$((0x200))
 	dd if="${BOOT_PATH}"/blobs/bl2.bin.hardkernel.1mb_uboot of=${SD_DEV} seek=31  bs=$((0x200))
 	dd if="${BOOT_PATH}"/u-boot-dtb.bin                     of=${SD_DEV} seek=63  bs=$((0x200))
-	dd if="${BOOT_PATH}"/blobs/tzsw.bin.hardkernel          of=${SD_DEV} seek=719 bs=$((0x200))
+	dd if="${BOOT_PATH}"/blobs/tzsw.bin.hardkernel          of=${SD_DEV} seek=2111 bs=$((0x200))
 }
 
 function finalise {
