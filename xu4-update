@@ -125,10 +125,10 @@ function update_firmware {
 function update_bootloader {
 	echo " *** Writing new bootloader to sd card"
 	cp -r "${FW_REPOLOCAL}"/{blobs,boot.scr,u-boot-dtb.bin} "${BOOT_PATH}"/
-	dd if="${BOOT_PATH}"/blobs/bl1.bin.hardkernel  of=${SD_DEV} seek=1   bs=$((0x200))
-	dd if="${BOOT_PATH}"/blobs/bl2.bin.hardkernel  of=${SD_DEV} seek=31  bs=$((0x200))
-	dd if="${BOOT_PATH}"/u-boot-dtb.bin            of=${SD_DEV} seek=63  bs=$((0x200))
-	dd if="${BOOT_PATH}"/blobs/tzsw.bin.hardkernel of=${SD_DEV} seek=719 bs=$((0x200))
+	dd if="${BOOT_PATH}"/blobs/bl1.bin.hardkernel           of=${SD_DEV} seek=1   bs=$((0x200))
+	dd if="${BOOT_PATH}"/blobs/bl2.bin.hardkernel.1mb_uboot of=${SD_DEV} seek=31  bs=$((0x200))
+	dd if="${BOOT_PATH}"/u-boot-dtb.bin                     of=${SD_DEV} seek=63  bs=$((0x200))
+	dd if="${BOOT_PATH}"/blobs/tzsw.bin.hardkernel          of=${SD_DEV} seek=719 bs=$((0x200))
 }
 
 function finalise {
