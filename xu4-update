@@ -129,6 +129,13 @@ function update_bootloader {
 	dd if="${BOOT_PATH}"/blobs/bl2.bin.hardkernel.1mb_uboot of=${SD_DEV} seek=31  bs=$((0x200))
 	dd if="${BOOT_PATH}"/u-boot-dtb.bin                     of=${SD_DEV} seek=63  bs=$((0x200))
 	dd if="${BOOT_PATH}"/blobs/tzsw.bin.hardkernel          of=${SD_DEV} seek=2111 bs=$((0x200))
+
+	# Clear env but check that we don't overwrite the first partition
+	# due to a wrong start sector value in xu4-strap (fixed in 4aa5180)
+	first_sector=$(fdisk -l ${SD_DEV} | awk "/\/dev\/${SD_DEV#/dev/}p1/ {print \$2}")
+	if [ $first_sector -ge 8192 ]; then
+		dd if=/dev/zero of=${SD_DEV} seek=6727 bs=$((0x200)) count=32
+	fi
 }
 
 function finalise {
